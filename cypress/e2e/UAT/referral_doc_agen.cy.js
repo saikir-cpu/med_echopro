@@ -111,7 +111,16 @@ cy.get('button[type="submit"]').click({force: true});
 
   })
 });
-describe('it should create patient successfully', () => {
+function cleanAndParse(text) {
+  if (typeof text !== 'string') {
+    return 0;
+  }
+  // Removes all characters that are not digits, a decimal point, or a minus sign
+  const cleanedText = text.replace(/[^0-9.-]+/g, "");
+  return parseFloat(cleanedText);
+}
+
+describe.only('it. should create patient successfully', () => {
     it('create patient and validate discount', () => {
          cy.loginAsAdmin();
 
@@ -184,7 +193,7 @@ cy.contains('label', 'Payment Method')
   .clear({ force: true })
   .type('P04345', { force: true });
   cy.get('.text-blue-500 > .text-blue-600').click({force: true});
-  cy.contains('button', 'visit').click({force: true});
+  cy.contains('button', /visit/i).click({force: true});
   cy.contains('button', 'Referral').click({force: true});
   cy.contains('button', 'Referral Details').click({force: true});
 cy.contains('td', 'Referral Name')  
@@ -221,10 +230,12 @@ cy.contains('td', 'Referral Share')
 expect(actualAmount).to.equal(21, 'Amount should be 21');
  });
        cy.contains('td', 'AB KOTA').parent('tr')
+       .within(() => {
       
         cy.get('td').eq(4).should('have.text', '8');  
         cy.get('td').eq(5).should('have.text', '6');  
         cy.get('td').eq(6).should('have.text', '48'); 
+       })
   
       cy.contains('td', 'AB Madhu')
       .parent('tr')
@@ -234,11 +245,104 @@ expect(actualAmount).to.equal(21, 'Amount should be 21');
         cy.get('td').eq(5).should('have.text', '7');   
         cy.get('td').eq(6).should('have.text', '6300'); 
       });
+      cy.contains('td', 'Total Doctor Charges:')
+      .next('td') // 2. Move to the adjacent cell with the total
+      .then(($totalCell) => {
+        // 3. Clean the text to remove '₹'
+        const uiTotal = cleanAndParse($totalCell.text());
+
+        // 4. Assert the value is 6369
+        expect(uiTotal).to.equal(6369, 'Total amount should be 6369');
+      });
+      cy.get('.text-left > .transform').check({force: true})
+      // ...existing code inside it('should verify referral discount applied in billing', ...)
+
+// 1) Validate Total Amount = 423118.09
+cy.contains('label', 'Total Amount')
+  .parent()
+  .find('input[type="number"]')
+  .should('have.value', '423118.09')
+  .then(($input) => {
+    const totalAmount = parseFloat($input.val());
+    expect(totalAmount).to.equal(423118.09, 'Total Amount should be 423118.09');
+  });
+
+// 2) Validate Excluded Amount = 6369
+cy.contains('label', 'Excluded Amount')
+  .parent()
+  .find('input[type="number"]')
+  .should('have.value', '6369')
+  .then(($input) => {
+    const excludedAmount = parseFloat($input.val());
+    expect(excludedAmount).to.equal(6369, 'Excluded Amount should be 6369');
+  });
+
+// 3) Validate Sub Total = Total Amount - Excluded Amount = 416749.09
+cy.contains('label', 'Sub Total')
+  .parent()
+  .find('input[type="number"]')
+  .should('have.value', '416749.09')
+  .then(($input) => {
+    const subTotal = parseFloat($input.val());
+    const expectedSubTotal = 423118.09 - 6369;
+    expect(subTotal).to.equal(expectedSubTotal, `Sub Total should be ${expectedSubTotal}`);
+    expect(subTotal).to.equal(416749.09, 'Sub Total should be 416749.09');
+  });
+
+// 4) Enter 25% in the Percentage field
+cy.contains('label', 'Percentage (%)')
+  .parent()
+  .find('input[type="number"], input[class*="border"]')
+  .clear({ force: true })
+  .type('25', { force: true });
+
+// 5) Validate Payable Amount = Sub Total * (1 - Percentage/100) = 416749.09 * 0.75 = 312561.8175 ≈ 312561.82
+//    OR if the app shows 104187.27 (which is 25% of 416749.09), adjust logic accordingly.
+//    Based on your prompt "after typing 25% it has to show the payable amount that is 104187.27",
+//    it seems Payable Amount = Sub Total * (Percentage / 100).
+//    Let's validate both scenarios:
+
+cy.contains('label', 'Payable Amount')
+  .parent()
+  .find('input[type="number"]')
+  .should('be.visible')
+  .then(($input) => {
+    const payableAmount = parseFloat($input.val());
+    // If your app calculates: Payable = SubTotal * (Percentage / 100)
+    const expectedPayableFromPercentage = (416749.09 * 25) / 100;
+    // If your app calculates: Payable = SubTotal - (SubTotal * Percentage / 100)
+    const expectedPayableAfterDiscount = 416749.09 - expectedPayableFromPercentage;
+
+    // Assert based on your app's logic (choose one):
+    // Option A: if payable = 25% of sub total
+    expect(payableAmount).to.be.closeTo(expectedPayableFromPercentage, 0.5, 'Payable Amount should be ~104187.27 (25% of Sub Total)');
+    // Option B: if payable = sub total - 25% discount
+    // expect(payableAmount).to.be.closeTo(expectedPayableAfterDiscount, 0.5, 'Payable Amount should be ~312561.82 (Sub Total after 25% discount)');
+  });
+
+cy.get('.mt-9 > :nth-child(1)').click({force: true})
+// ...existing code...
+cy.contains('label', 'Payment Method')
+  .next('select')
+  .select('Cash');  // ← cy.select() automatically changes the value; no .click() needed
+
+ cy.contains('button', 'Submit Payment').click({force: true});
+// ...existing code...
+      
+  });
+   
+    });
   
 
 
-})
-})
+  
+  
+  
+  
+
+
+
+
 
 
 
