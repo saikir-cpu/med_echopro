@@ -197,20 +197,10 @@ cy.contains('td', 'Referral Share')
   cy.contains('button', 'Doctor Charges').click({force: true});
   cy.contains('td', 'AB MADDY')
       .parent('tr')
-      .as('doctorRow'); // Assign an alias to the row for easier reference
-
-    // 2. From that specific row, find all cells (td)
-    cy.get('@doctorRow')
-      .find('td')
+      .as('doctorRow'); 
+ cy.get('@doctorRow').find('td')
       .then($cells => {
-        // $cells is a jQuery object of all <td> elements in that row.
-        // We get their text content by index based on the image:
-        // Index 1: "AB MADDY" (we already know this)
-        // Index 4: "7" (Rate)
-        // Index 5: "3" (Quantity)
-        // Index 6: "21" (Amount)
-
-        // 3. Extract text and convert to numbers
+        
         const rateText = $cells.eq(4).text();
         const quantityText = $cells.eq(5).text();
         const amountText = $cells.eq(6).text();
@@ -219,37 +209,38 @@ cy.contains('td', 'Referral Share')
         const quantity = parseFloat(quantityText);
         const actualAmount = parseFloat(amountText);
 
-        // 4. Calculate the expected amount
-        const expectedAmount = rate * quantity;
+        
+         const expectedAmount = rate * quantity;
 
-        // 5. Log for debugging (optional, view in Cypress runner)
+        
         cy.log(`Validating Row: Rate(${rate}) * Quantity(${quantity}) = ${expectedAmount}`);
 
-        // --- ASSERTIONS ---
-
-        // A) Validate the text values from the prompt are correct
-        expect(rate).to.equal(7, 'Rate should be 7');
+     expect(rate).to.equal(7, 'Rate should be 7');
         expect(quantity).to.equal(3, 'Quantity should be 3');
-
-        // B) Validate the final calculated amount
-        expect(actualAmount).to.equal(expectedAmount, 'Amount should be Rate * Quantity');
-
-        // C) Explicitly validate the final amount is 21
-        expect(actualAmount).to.equal(21, 'Amount should be 21');
-      });
-       cy.contains('td', 'AB KOTA')
+ expect(actualAmount).to.equal(expectedAmount, 'Amount should be Rate * Quantity');
+expect(actualAmount).to.equal(21, 'Amount should be 21');
+ });
+       cy.contains('td', 'AB KOTA').parent('tr')
+      
+        cy.get('td').eq(4).should('have.text', '8');  
+        cy.get('td').eq(5).should('have.text', '6');  
+        cy.get('td').eq(6).should('have.text', '48'); 
+  
+      cy.contains('td', 'AB Madhu')
       .parent('tr')
       .within(() => {
-        // .within() scopes all commands to this row
-        cy.get('td').eq(4).should('have.text', '8');  // Validate Rate
-        cy.get('td').eq(5).should('have.text', '6');  // Validate Quantity
-        cy.get('td').eq(6).should('have.text', '48'); // Validate Amount
+        
+        cy.get('td').eq(4).should('have.text', '900');  
+        cy.get('td').eq(5).should('have.text', '7');   
+        cy.get('td').eq(6).should('have.text', '6300'); 
       });
   
 
 
 })
 })
+
+
 
 
 
