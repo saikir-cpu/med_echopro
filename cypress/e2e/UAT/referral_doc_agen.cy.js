@@ -120,7 +120,7 @@ function cleanAndParse(text) {
   return parseFloat(cleanedText);
 }
 
-describe.only('it. should create patient successfully', () => {
+describe('it. should create patient successfully', () => {
     it('create patient and validate discount', () => {
          cy.loginAsAdmin();
 
@@ -255,7 +255,7 @@ expect(actualAmount).to.equal(21, 'Amount should be 21');
         expect(uiTotal).to.equal(6369, 'Total amount should be 6369');
       });
       cy.get('.text-left > .transform').check({force: true})
-      // ...existing code inside it('should verify referral discount applied in billing', ...)
+      
 
 // 1) Validate Total Amount = 423118.09
 cy.contains('label', 'Total Amount')
@@ -277,7 +277,6 @@ cy.contains('label', 'Excluded Amount')
     expect(excludedAmount).to.equal(6369, 'Excluded Amount should be 6369');
   });
 
-// 3) Validate Sub Total = Total Amount - Excluded Amount = 416749.09
 cy.contains('label', 'Sub Total')
   .parent()
   .find('input[type="number"]')
@@ -288,46 +287,34 @@ cy.contains('label', 'Sub Total')
     expect(subTotal).to.equal(expectedSubTotal, `Sub Total should be ${expectedSubTotal}`);
     expect(subTotal).to.equal(416749.09, 'Sub Total should be 416749.09');
   });
-
-// 4) Enter 25% in the Percentage field
 cy.contains('label', 'Percentage (%)')
   .parent()
   .find('input[type="number"], input[class*="border"]')
   .clear({ force: true })
   .type('25', { force: true });
-
-// 5) Validate Payable Amount = Sub Total * (1 - Percentage/100) = 416749.09 * 0.75 = 312561.8175 ≈ 312561.82
-//    OR if the app shows 104187.27 (which is 25% of 416749.09), adjust logic accordingly.
-//    Based on your prompt "after typing 25% it has to show the payable amount that is 104187.27",
-//    it seems Payable Amount = Sub Total * (Percentage / 100).
-//    Let's validate both scenarios:
-
 cy.contains('label', 'Payable Amount')
   .parent()
   .find('input[type="number"]')
   .should('be.visible')
   .then(($input) => {
     const payableAmount = parseFloat($input.val());
-    // If your app calculates: Payable = SubTotal * (Percentage / 100)
     const expectedPayableFromPercentage = (416749.09 * 25) / 100;
-    // If your app calculates: Payable = SubTotal - (SubTotal * Percentage / 100)
+    
     const expectedPayableAfterDiscount = 416749.09 - expectedPayableFromPercentage;
 
-    // Assert based on your app's logic (choose one):
-    // Option A: if payable = 25% of sub total
+    
     expect(payableAmount).to.be.closeTo(expectedPayableFromPercentage, 0.5, 'Payable Amount should be ~104187.27 (25% of Sub Total)');
-    // Option B: if payable = sub total - 25% discount
-    // expect(payableAmount).to.be.closeTo(expectedPayableAfterDiscount, 0.5, 'Payable Amount should be ~312561.82 (Sub Total after 25% discount)');
+    
   });
 
 cy.get('.mt-9 > :nth-child(1)').click({force: true})
-// ...existing code...
+
 cy.contains('label', 'Payment Method')
   .next('select')
-  .select('Cash');  // ← cy.select() automatically changes the value; no .click() needed
+  .select('Cash');  
 
  cy.contains('button', 'Submit Payment').click({force: true});
-// ...existing code...
+
       
   });
    
