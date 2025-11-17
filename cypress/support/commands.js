@@ -3,6 +3,10 @@
 // create various custom commands and overwrite
 // existing commands.
 import 'cypress-file-upload';
+// ...existing code...
+// Import custom commands
+import './commands';
+// ...existing code...
 
 Cypress.Commands.add('loginAsPharmacist', () => {
   cy.visit('https://uat.medimind.in/');
@@ -36,23 +40,48 @@ Cypress.Commands.add('loginAsAdmin', () => {
   
   
 });
-//// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+
+Cypress.Commands.add('loginAsAdmin', () => {
+  
+  cy.visit('https://uat.medimind.in/', { timeout: 120000, failOnStatusCode: false });
+
+  
+  cy.get('input[name="username"]', { timeout: 40000 })
+    .should('be.visible')
+    .type('admin')
+
+  cy.get('input[name="password"]')
+    .should('be.visible')
+    .type('mind@345')
+
+  
+  cy.get('button[type="submit"]')
+    .should('be.enabled')
+    .click();
+
+  cy.get('.dashboard-container, .MuiDrawer-root, .sidebar', { timeout: 60000 })
+    .should('be.visible');
+});
+
+Cypress.Commands.add('loginasadmin', () => {
+
+  cy.visit('https://virat.medimind.in/', { timeout: 120000, failOnStatusCode: false });
+
+  
+  cy.get('input[name="username"]', { timeout: 40000 })
+    .should('be.visible')
+    .type('admin')
+
+  cy.get('input[name="password"]')
+    .should('be.visible')
+    .type('Virat@27102025')
+
+  
+  cy.get('button[type="submit"]')
+    .should('be.enabled')
+    .click();
+
+  cy.get('.dashboard-container, .MuiDrawer-root, .sidebar', { timeout: 60000 })
+    .should('be.visible');
+});
