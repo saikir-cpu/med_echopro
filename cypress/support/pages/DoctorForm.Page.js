@@ -59,6 +59,7 @@ class DoctorFormPage {
   submit() {
     cy.get('button[type="submit"]').contains('Create', { timeout: 10000 }).click({ force: true });
     return this;
+    
   }
 }
 
