@@ -118,3 +118,24 @@ Cypress.Commands.add('loginAsStaff', () => {
 
   
 });
+
+Cypress.Commands.add('loginAsDoctor', () => {
+  
+  cy.visit('https://uat.medimind.in/', { timeout: 120000, failOnStatusCode: false });
+
+  
+  cy.get('input[name="username"]', { timeout: 40000 })
+    .should('be.visible')
+    .type('avinashkumar')
+
+  cy.get('input[name="password"]')
+    .should('be.visible')
+    .type('Avinash@123')
+
+  
+  cy.get('button[type="submit"]')
+    .should('be.enabled')
+    .click({force:true});
+
+  
+});
