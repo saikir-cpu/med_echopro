@@ -26,7 +26,7 @@ describe('Virat hospital general flows Creation', () => {
     .first()
     .scrollIntoView({ ensureScrollable: false })
     .click({ force: true });
-    cy.get('[name="firstName"]').type('renuka',{force: true})
+    cy.get('[name="firstName"]').type('srikanth tiwari',{force: true})
     cy.get('[name="age"]').type('46',{force: true})
     cy.contains('label', 'Doctor Type').parent().find('div[role="combobox"]').click({force: true});
     cy.get('li[data-value="Regular"]').click({force: true});

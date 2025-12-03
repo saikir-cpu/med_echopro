@@ -136,7 +136,7 @@ cy.get('@ambulanceRow').within(() => {
     expect(n).to.be.a('number');
   });
 });
-// ...existing code...
+
 
 
 
