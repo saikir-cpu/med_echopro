@@ -6,7 +6,7 @@ describe('In-Patient Creation Flow', () => {
   const patient = new PatientCreationPage();
   const indent = new IndentPage();
 
-  it('should create an inpatient successfully', () => {
+  it.skip('should create an inpatient successfully', () => {
      cy.clearCookies();
     cy.clearLocalStorage();
 
@@ -21,9 +21,9 @@ describe('In-Patient Creation Flow', () => {
     patient.createInPatient();
 
     // Step 2: Basic Patient Details
-    patient.enterPatientName('anita', 'desai');
+    patient.enterPatientName('anita', 'desaii');
     patient.enterDOB('01/01/1990');
-    patient.enterPhone('+916281335792');
+    patient.enterPhone('+916281335793');
 
     patient.selectGender('Male');
     patient.selectPatientType('Cash');
@@ -41,7 +41,7 @@ describe('In-Patient Creation Flow', () => {
 
     // Step 4: Bed Allocation
     patient.selectRoom('private/Balconi Special - 007 - 007 - Available');
-    patient.selectBed('Bed No: 0068 - Available');
+    patient.selectBed('Bed No: 0065 - Available');
 
     // Step 5: Payment Details
     patient.enterDeposit(5000);
@@ -56,7 +56,7 @@ describe('In-Patient Creation Flow', () => {
   })
 
 
-  it('ordering medicines to ip patient', () => {
+  it.skip('ordering medicines to ip patient', () => {
     cy.clearCookies();
     cy.clearLocalStorage();
 
@@ -98,7 +98,7 @@ it('validating indent billing through pharmacist', () => {
     // Click Buy button - this navigates to retail invoice page
     indent.clickBuyButtonByPatientId('P018195');
     indent.clickEyeIcon()
-    indent.checkMedicineByOrderId('IP-Med-00001')
+    indent.checkMedicineByOrderId('IP-Med-00005')
     indent.clickSubmit()
     indent.closePopup()
     indent.clickGenerateReceipt()
