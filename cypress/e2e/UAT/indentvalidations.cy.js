@@ -104,7 +104,7 @@ it('validating indent billing through pharmacist', () => {
     indent.clickGenerateReceipt()
     
 })
-it.only('should create an inpatient successfully', () => {
+it('should create an inpatient successfully', () => {
      cy.clearCookies();
     cy.clearLocalStorage();
 
