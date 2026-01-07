@@ -35,7 +35,7 @@ Cypress.Commands.add('loginAsAdmin', () => {
 
   cy.get('input[name="password"]')
     .should('be.visible')
-    .type('admin@123')
+    .type('mind@345')
 
   
   cy.get('button[type="submit"]')
