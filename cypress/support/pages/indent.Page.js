@@ -332,6 +332,51 @@ parseAmount(text) {
       });
     });
   }
+  getDepositedAmount() {
+    return cy.contains('p', 'DEPOSITED')
+      .next()
+      .invoke('text');
+  }
+
+  getTotalCharges() {
+    return cy.contains('p', 'TOTAL CHARGES')
+      .next()
+      .invoke('text');
+  }
+
+  getDiscount() {
+    return cy.contains('p', 'DISCOUNT')
+      .next()
+      .invoke('text');
+  }
+
+  getBalanceDue() {
+    return cy.contains('p', 'BALANCE DUE')
+      .next()
+      .invoke('text');
+  }
+
+  getBalanceAmount() {
+    return cy.contains('p', 'BALANCE AMOUNT')
+      .next()
+      .invoke('text');
+  }
+
+  /* ---------- CHARGE BREAKDOWN ---------- */
+  getChargeByLabel(label) {
+    return cy.contains('p', label)
+      .parent()
+      .find('p')
+      .last()
+      .invoke('text');
+  }
+
+  /* ---------- UTILITY ---------- */
+  parseAmount(amountText) {
+    return parseFloat(
+      amountText.replace(/[₹,]/g, '').trim()
+    );
+  }
 
 
 

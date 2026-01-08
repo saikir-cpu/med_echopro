@@ -185,6 +185,173 @@ class PatientCreationPage {
   submit() {
     this.clickButton('Submit');
   }
+  getConsultantTab() {
+    // Button that contains visible text "Consultant"
+    return cy.contains('button', 'Consultant');
+  }
+
+  clickConsultantTab() {
+    this.getConsultantTab()
+      .should('be.visible')
+      .and('not.be.disabled')
+      .click();
+  }
+  getMoreVertIcon() {
+    // MUI icon has data-testid
+    return cy.get('[data-testid="MoreVertIcon"]');
+  }
+
+  clickMoreVertIcon() {
+    this.getMoreVertIcon()
+      .should('be.visible')
+      .click();
+  }
+
+  /* ---------- UPDATE OPTION FROM POPUP ---------- */
+  getUpdateOption() {
+    // MUI menu item text
+    return cy.contains('li', 'Update');
+  }
+
+  clickUpdateOption() {
+    this.getUpdateOption()
+      .should('be.visible')
+      .click();
+  }
+   getDurationInput() {
+    return cy.get('input[name="duration_in_days"]');
+  }
+
+  enterDurationInDays(days) {
+    this.getDurationInput()
+      .should('be.visible')
+      .clear()
+      .type(days);
+  }
+
+  /* ---------- UPDATE BUTTON ---------- */
+  getUpdateButton() {
+    return cy.contains('button', /^Update$/);
+  }
+
+  clickUpdateButton() {
+    this.getUpdateButton()
+      .should('be.visible')
+      .and('not.be.disabled')
+      .click();
+  }
+  getRoomsBedsTab() {
+    return cy.contains('button', 'Rooms & Beds');
+  }
+
+  clickRoomsBedsTab() {
+    this.getRoomsBedsTab()
+      .should('be.visible')
+      .click();
+  }
+
+  /* ---------- MORE VERT ICON ---------- */
+  getMoreVertIcon() {
+    return cy.get('[data-testid="MoreVertIcon"]').first();
+  }
+
+  clickMoreVertIcon() {
+    this.getMoreVertIcon()
+      .should('be.visible')
+      .click();
+  }
+
+  /* ---------- UPDATE OPTION ---------- */
+  getUpdateOption() {
+    return cy.contains('li', 'Update');
+  }
+
+  clickUpdateOption() {
+    this.getUpdateOption()
+      .should('be.visible')
+      .click();
+  }
+  getRoomBedsDaysInput() {
+    return cy.get('input[name="nursing_no_days"], input[id^="r2k"]')
+             .first();
+  }
+
+  enterRoomBedsDays(days) {
+    this.getRoomBedsDaysInput()
+      .should('be.visible')
+      .clear()
+      .type(days);
+  }
+  getRoomBedsNoOfDaysInput() {
+    // First "No. of Days" field inside Update Room And Beds modal
+    return cy.contains('label', 'No.of Days')
+      .first()
+      .parent()
+      .find('input[type="number"]');
+  }
+
+  enterRoomBedsNoOfDays(days) {
+    this.getRoomBedsNoOfDaysInput()
+      .should('be.visible')
+      .clear()
+      .type(days);
+  }
+
+  /* ---------- DMO CHARGES - NO OF DAYS ---------- */
+  getDmoDaysInput() {
+    return cy.get('input[name="dmo_no_days"]');
+  }
+
+  enterDmoDays(days) {
+    this.getDmoDaysInput()
+      .should('be.visible')
+      .clear()
+      .type(days);
+  }
+
+  /* ---------- NURSING CHARGES - NO OF DAYS ---------- */
+  getNursingDaysInput() {
+    return cy.get('input[name="nursing_no_days"]').last();
+  }
+
+  enterNursingDays(days) {
+    this.getNursingDaysInput()
+      .should('be.visible')
+      .clear()
+      .type(days);
+  }
+
+  /* ---------- UPDATE BUTTON ---------- */
+  getUpdateButton() {
+    return cy.contains('button', /^Update$/);
+  }
+
+  clickUpdateButton() {
+    this.getUpdateButton()
+      .should('be.visible')
+      .and('not.be.disabled')
+      .click();
+  }
+  
+ 
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
 }
 
 export default PatientCreationPage;

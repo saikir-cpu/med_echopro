@@ -56,7 +56,7 @@ describe('In-Patient Creation Flow', () => {
   })
 
 
-  it.skip('ordering medicines to ip patient', () => {
+  it('ordering medicines to ip patient', () => {
     cy.clearCookies();
     cy.clearLocalStorage();
 
@@ -67,14 +67,14 @@ describe('In-Patient Creation Flow', () => {
     cy.url().should('include', '/dashboard');
 
      patient.clickPatientsMenu()
-      indent.clickInPatientById('P018195')
+      indent.clickInPatientById('P018206')
       indent.clickVisitButton() 
       indent.clickMedicationButton()
       indent.clickRequest()
        indent.requestMultipleMedicines([
-    { name: 'Levipil 500', qty: 100 },
-    { name: 'Nervpace Capsule', qty: 1000 },
-    { name: 'Calcigo Max Softgel Capsule', qty: 50}
+    { name: 'Cal D 250mg Tablet', qty: 90 },
+    { name: 'Oxetol 300 Tablet', qty: 90},
+    { name: 'LACOSET 100MG', qty: 200}
   ]);
 
       })
@@ -96,9 +96,9 @@ it('validating indent billing through pharmacist', () => {
     cy.contains('P018195').should('be.visible');
     
     // Click Buy button - this navigates to retail invoice page
-    indent.clickBuyButtonByPatientId('P018195');
+    indent.clickBuyButtonByPatientId('P018206');
     indent.clickEyeIcon()
-    indent.checkMedicineByOrderId('IP-Med-00005')
+    indent.checkMedicineByOrderId('IP-Med-00001')
     indent.clickSubmit()
     indent.closePopup()
     indent.clickGenerateReceipt()
@@ -116,13 +116,98 @@ it('should create an inpatient successfully', () => {
 
     // Step 1: Open Patient Creation
     patient.clickPatientsMenu()
-     indent.clickInPatientById('P018195')
+     indent.clickInPatientById('P018206')
       indent.clickVisitButton()
-      indent.validateBalanceDue()
+      patient.clickConsultantTab()
+      patient.clickMoreVertIcon()
+      patient.clickUpdateOption() 
+      patient.enterDurationInDays('5')
+      patient.clickUpdateButton()
+      patient.clickRoomsBedsTab()
+      patient.clickMoreVertIcon()
+      patient.clickUpdateOption()
+      patient.enterRoomBedsNoOfDays('5')
+      patient.enterDmoDays('5')
+      patient.enterNursingDays('5') 
+      patient.clickUpdateButton()
+      
 
 
 
 })
+it.only('Validate patient billing summary calculations', () => {
+     cy.clearCookies();
+    cy.clearLocalStorage();
+
+    // Login (replace with your actual custom command)
+    cy.loginAsAdmin();
+
+    cy.viewport(1400, 900);
+    cy.url().should('include', '/dashboard');
+
+    // Step 1: Open Patient Creation
+    patient.clickPatientsMenu()
+     indent.clickInPatientById('P018206')
+      indent.clickVisitButton()
+      cy.wrap({}).then(async () => {
+
+    const deposited = indent.parseAmount(await indent.getDepositedAmount());
+    const totalChargesUI = indent.parseAmount(await indent.getTotalCharges());
+    const discount = indent.parseAmount(await indent.getDiscount());
+    const balanceDueUI = indent.parseAmount(await indent.getBalanceDue());
+    const balanceAmountUI = indent.parseAmount(await indent.getBalanceAmount());
+
+    const admission = indent.parseAmount(
+      await indent.getChargeByLabel('Admission & Operation Charges')
+    );
+    const doctorICU = indent.parseAmount(
+      await indent.getChargeByLabel('Doctor & ICU Charges')
+    );
+    const roomBed = indent.parseAmount(
+      await indent.getChargeByLabel('Room & Bed Charges')
+    );
+    const services = indent.parseAmount(
+      await indent.getChargeByLabel('Services & Procedure Charges')
+    );
+    const pathology = indent.parseAmount(
+      await indent.getChargeByLabel('Pathology Charges')
+    );
+    const medication = indent.parseAmount(
+      await indent.getChargeByLabel('Medication Charges')
+    );
+
+    /* ---------- BUSINESS CALCULATIONS ---------- */
+    const calculatedTotalCharges =
+      admission +
+      doctorICU +
+      roomBed +
+      services +
+      pathology +
+      medication;
+
+    const calculatedBalanceDue =
+      calculatedTotalCharges - deposited - discount;
+
+    const calculatedBalanceAmount =
+      deposited > calculatedTotalCharges
+        ? deposited - calculatedTotalCharges
+        : 0;
+
+    /* ---------- ASSERTIONS ---------- */
+    expect(calculatedTotalCharges).to.eq(totalChargesUI);
+    expect(calculatedBalanceDue).to.eq(balanceDueUI);
+    expect(calculatedBalanceAmount).to.eq(balanceAmountUI);
+
+  });
+
+
+
+
+
+
+
+})
+
 
 
 
