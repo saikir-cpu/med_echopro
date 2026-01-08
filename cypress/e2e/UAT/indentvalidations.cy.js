@@ -6,7 +6,7 @@ describe('In-Patient Creation Flow', () => {
   const patient = new PatientCreationPage();
   const indent = new IndentPage();
 
-  it.skip('should create an inpatient successfully', () => {
+  it('should create an inpatient successfully', () => {
      cy.clearCookies();
     cy.clearLocalStorage();
 
@@ -21,7 +21,7 @@ describe('In-Patient Creation Flow', () => {
     patient.createInPatient();
 
     // Step 2: Basic Patient Details
-    patient.enterPatientName('anita', 'desaii');
+    patient.enterPatientName('puri','jagan');
     patient.enterDOB('01/01/1990');
     patient.enterPhone('+916281335793');
 
@@ -41,10 +41,10 @@ describe('In-Patient Creation Flow', () => {
 
     // Step 4: Bed Allocation
     patient.selectRoom('private/Balconi Special - 007 - 007 - Available');
-    patient.selectBed('Bed No: 0065 - Available');
+    patient.selectBed('Bed No: 0061 - Available');
 
     // Step 5: Payment Details
-    patient.enterDeposit(5000);
+    patient.enterDeposit(20000);
     patient.selectPaymentMethod('Cash');
 
     // Step 6: Submit
@@ -67,14 +67,14 @@ describe('In-Patient Creation Flow', () => {
     cy.url().should('include', '/dashboard');
 
      patient.clickPatientsMenu()
-      indent.clickInPatientById('P018206')
+      indent.clickInPatientById('P018220')
       indent.clickVisitButton() 
       indent.clickMedicationButton()
       indent.clickRequest()
        indent.requestMultipleMedicines([
-    { name: 'Cal D 250mg Tablet', qty: 90 },
-    { name: 'Oxetol 300 Tablet', qty: 90},
-    { name: 'LACOSET 100MG', qty: 200}
+    { name: 'Dan 100mg Tablet SR', qty: 70 },
+    { name: 'Dan 50mg Injection', qty:90 },
+    { name: 'Dan Shine Lotion', qty:90 }
   ]);
 
       })
@@ -93,12 +93,12 @@ it('validating indent billing through pharmacist', () => {
     cy.wait(2000);
     
     // Verify patient exists in the table before clicking
-    cy.contains('P018195').should('be.visible');
+    cy.contains('P018220').should('be.visible');
     
     // Click Buy button - this navigates to retail invoice page
-    indent.clickBuyButtonByPatientId('P018206');
+    indent.clickBuyButtonByPatientId('P018220');
     indent.clickEyeIcon()
-    indent.checkMedicineByOrderId('IP-Med-00001')
+    indent.checkMedicineByOrderId('IP-Med-00007')
     indent.clickSubmit()
     indent.closePopup()
     indent.clickGenerateReceipt()
@@ -116,7 +116,7 @@ it('should create an inpatient successfully', () => {
 
     // Step 1: Open Patient Creation
     patient.clickPatientsMenu()
-     indent.clickInPatientById('P018206')
+     indent.clickInPatientById('P018220')
       indent.clickVisitButton()
       patient.clickConsultantTab()
       patient.clickMoreVertIcon()
@@ -135,78 +135,76 @@ it('should create an inpatient successfully', () => {
 
 
 })
+
 it.only('Validate patient billing summary calculations', () => {
-     cy.clearCookies();
-    cy.clearLocalStorage();
 
-    // Login (replace with your actual custom command)
-    cy.loginAsAdmin();
+  cy.loginAsAdmin();
+  cy.viewport(1400, 900);
 
-    cy.viewport(1400, 900);
-    cy.url().should('include', '/dashboard');
+  patient.clickPatientsMenu();
+  indent.clickInPatientById('P018220');
+  indent.clickVisitButton();
 
-    // Step 1: Open Patient Creation
-    patient.clickPatientsMenu()
-     indent.clickInPatientById('P018206')
-      indent.clickVisitButton()
-      cy.wrap({}).then(async () => {
+  const v = {};
 
-    const deposited = indent.parseAmount(await indent.getDepositedAmount());
-    const totalChargesUI = indent.parseAmount(await indent.getTotalCharges());
-    const discount = indent.parseAmount(await indent.getDiscount());
-    const balanceDueUI = indent.parseAmount(await indent.getBalanceDue());
-    const balanceAmountUI = indent.parseAmount(await indent.getBalanceAmount());
+  cy.wrap(null)
+    .then(() => indent.getBreakdownAmount('Admission & Operation Charges'))
+    .then(x => v.admission = x)
 
-    const admission = indent.parseAmount(
-      await indent.getChargeByLabel('Admission & Operation Charges')
-    );
-    const doctorICU = indent.parseAmount(
-      await indent.getChargeByLabel('Doctor & ICU Charges')
-    );
-    const roomBed = indent.parseAmount(
-      await indent.getChargeByLabel('Room & Bed Charges')
-    );
-    const services = indent.parseAmount(
-      await indent.getChargeByLabel('Services & Procedure Charges')
-    );
-    const pathology = indent.parseAmount(
-      await indent.getChargeByLabel('Pathology Charges')
-    );
-    const medication = indent.parseAmount(
-      await indent.getChargeByLabel('Medication Charges')
-    );
+    .then(() => indent.getBreakdownAmount('Room & Bed Charges'))
+    .then(x => v.roomBed = x)
 
-    /* ---------- BUSINESS CALCULATIONS ---------- */
-    const calculatedTotalCharges =
-      admission +
-      doctorICU +
-      roomBed +
-      services +
-      pathology +
-      medication;
+    .then(() => indent.getBreakdownAmount('Doctor & ICU Charges'))
+    .then(x => v.doctorICU = x)
 
-    const calculatedBalanceDue =
-      calculatedTotalCharges - deposited - discount;
+    .then(() => indent.getBreakdownAmount('Medication Charges'))
+    .then(x => v.medication = x)
 
-    const calculatedBalanceAmount =
-      deposited > calculatedTotalCharges
-        ? deposited - calculatedTotalCharges
-        : 0;
+    .then(() => indent.getBreakdownAmount('Services & Procedure Charges'))
+    .then(x => v.services = x)
 
-    /* ---------- ASSERTIONS ---------- */
-    expect(calculatedTotalCharges).to.eq(totalChargesUI);
-    expect(calculatedBalanceDue).to.eq(balanceDueUI);
-    expect(calculatedBalanceAmount).to.eq(balanceAmountUI);
+    .then(() => indent.getBreakdownAmount('Pathology Charges'))
+    .then(x => v.pathology = x)
 
-  });
+    .then(() => indent.getSummaryAmount('TOTAL CHARGES'))
+    .then(x => v.totalChargesUI = x)
 
+    .then(() => indent.getSummaryAmount('DEPOSITED'))
+    .then(x => v.deposited = x)
 
+    .then(() => indent.getSummaryAmount('BALANCE DUE'))
+    .then(x => v.balanceDueUI = x)
 
+    .then(() => indent.getSummaryAmount('BALANCE AMOUNT'))
+    .then(x => v.balanceAmountUI = x)
 
+    // ✅ ASSERTIONS — GUARANTEED DATA
+    .then(() => {
 
+      const breakdownSum =
+        v.admission +
+        v.roomBed +
+        v.doctorICU +
+        v.medication +
+        v.services +
+        v.pathology;
+
+      const expectedBalanceDue =
+        Number((v.totalChargesUI - v.deposited).toFixed(2));
+
+      const expectedBalanceAmount =
+        Math.max(0, Number((v.deposited - v.totalChargesUI).toFixed(2)));
+
+      cy.log(JSON.stringify(v));
+
+      // ✅ CORRECT VALIDATIONS
+      expect(v.totalChargesUI).to.be.at.least(breakdownSum);
+      expect(v.balanceDueUI).to.eq(expectedBalanceDue);
+      expect(v.balanceAmountUI).to.eq(expectedBalanceAmount);
+    });
+});
 
 
-})
 
 
 

@@ -364,20 +364,60 @@ parseAmount(text) {
 
   /* ---------- CHARGE BREAKDOWN ---------- */
   getChargeByLabel(label) {
-    return cy.contains('p', label)
-      .parent()
-      .find('p')
-      .last()
-      .invoke('text');
+  return cy
+    .contains('p', label)
+    .should('exist')
+    .closest('div')
+    .find('p')
+    .last();
+}
+
+
+  getSummaryValue(label) {
+  return cy.contains('p', label)
+    .parent()
+    .find('p')
+    .last()
+    .invoke('text');
+}
+getAmountByLabel(label) {
+  return cy
+    .contains('p', label)
+    .should('exist')
+    .closest('div')
+    .find('p')
+    .last()
+    .invoke('text')
+    .then(text => Number(text.replace(/[₹,]/g, '').trim()));
+}
+parseAmount(text) {
+    return Number(text.replace(/[₹,]/g, '').trim());
   }
+
+  // 🔹 Billing Summary cards (TOP)
+  getBreakdownAmount(label) {
+  return cy
+    .contains('p', label)
+    .siblings('p')
+    .invoke('text')
+    .then(t => Number(t.replace(/[₹,]/g, '').trim()));
+}
+
+getSummaryAmount(label) {
+  return cy
+    .contains('p', label)
+    .next('p')
+    .invoke('text')
+    .then(t => Number(t.replace(/[₹,]/g, '').trim()));
+}
+
+
+
+
+
 
   /* ---------- UTILITY ---------- */
-  parseAmount(amountText) {
-    return parseFloat(
-      amountText.replace(/[₹,]/g, '').trim()
-    );
-  }
-
+ 
 
 
 
